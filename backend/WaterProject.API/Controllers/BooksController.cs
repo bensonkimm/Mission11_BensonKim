@@ -19,9 +19,16 @@ namespace WaterProject.API.Controllers
         // ✅ GET ALL BOOKS WITH PAGINATION AND SORTING
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks(
-            int page = 1, int pageSize = 5, string? sort = "Title")
+            int page = 1, int pageSize = 5, string? sort = "Title", string? Category = null)
         {
             var booksQuery = _context.Books.AsQueryable();
+
+
+            // Filter by category if provided
+            if (!string.IsNullOrEmpty(Category))
+            {
+                booksQuery = booksQuery.Where(b => b.Category == Category);
+            }
 
             // Sorting
             booksQuery = sort switch

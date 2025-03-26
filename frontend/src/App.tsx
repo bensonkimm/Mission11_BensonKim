@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 interface Book {
   id: number;
@@ -13,57 +14,116 @@ interface Book {
   price: number;
 }
 
+interface CartItem extends Book {
+  quantity: number;
+}
+
 const App = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [sortBy, setSortBy] = useState("Title");
-  const [error, setError] = useState<string | null>(null);
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        console.log(
-          `Fetching books from: https://localhost:7135/api/books?page=${currentPage}&pageSize=${pageSize}&sort=${sortBy}`
-        );
-
-        const response = await axios.get("https://localhost:7135/api/books", {
-          params: { page: currentPage, pageSize, sort: sortBy },
-        });
-
-        if (response.status === 200) {
-          setBooks(response.data);
-          setError(null);
-        } else {
-          setError("No books available.");
-        }
-      } catch (error) {
-        console.error("Error fetching books:", error);
+    axios
+      .get("https://localhost:7135/api/books", {
+        params: {
+          page: currentPage,
+          pageSize,
+          sort: sortBy,
+          ...(category && { category }), // only adds category if not empty
+        },
+      })
+      .then((res) => {
+        setBooks(res.data);
+        setError("");
+      })
+      .catch((err) => {
+        console.error(err);
         setError("Failed to fetch books. Please check your backend.");
-      }
-    };
+      });
+  }, [currentPage, pageSize, sortBy, category]);
 
-    fetchBooks();
-  }, [currentPage, pageSize, sortBy]);
+  useEffect(() => {
+    setCategories([
+      "Classic",
+      "Biography",
+      "Historical",
+      "Self-Help",
+      "Business",
+      "Thrillers",
+      "Christian Books",
+      "Health",
+      "Action",
+    ]);
+  }, []);
+  
+
+  const addToCart = (book: Book) => {
+    setCart((prevCart) => {
+      const existingIndex = prevCart.findIndex(
+        (item) =>
+          item.title === book.title &&
+          item.author === book.author &&
+          item.price === book.price
+      );
+
+      if (existingIndex !== -1) {
+        const updatedCart = [...prevCart];
+        updatedCart[existingIndex] = {
+          ...updatedCart[existingIndex],
+          quantity: updatedCart[existingIndex].quantity + 1,
+        };
+        return updatedCart;
+      } else {
+        return [...prevCart, { ...book, quantity: 1 }];
+      }
+    });
+  };
+
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <div className="container mt-4">
-      <h1 className="text-center">📚 Online Bookstore</h1>
+      <h1 className="text-center">
+        📚 Benson's Online Bookstore <span className="badge bg-info">{books.length} Books</span>
+      </h1>
 
-      {/* Sorting Options */}
-      <div className="mb-3">
-        <label>Sort by: </label>
-        <select
-          className="form-select w-auto d-inline-block ms-2"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-          <option value="Title">Title</option>
-          <option value="Author">Author</option>
-        </select>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <label>Sort by: </label>
+          <select
+            className="form-select w-auto d-inline-block ms-2"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="Title">Title</option>
+            <option value="Author">Author</option>
+          </select>
+
+          <label className="ms-4">Filter by category: </label>
+          <select
+            className="form-select w-auto d-inline-block ms-2"
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setCurrentPage(1); // go to page 1 when category changes
+            }}
+          >
+            <option value="">All</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* Books Table */}
       <table className="table table-dark table-striped">
         <thead>
           <tr>
@@ -74,16 +134,11 @@ const App = () => {
             <th>Category</th>
             <th>Pages</th>
             <th>Price</th>
+            <th>Add</th>
           </tr>
         </thead>
         <tbody>
-          {error ? (
-            <tr>
-              <td colSpan={7} className="text-center text-danger">
-                {error}
-              </td>
-            </tr>
-          ) : books.length > 0 ? (
+          {books.length > 0 ? (
             books.map((book) => (
               <tr key={book.id}>
                 <td>{book.title}</td>
@@ -93,19 +148,26 @@ const App = () => {
                 <td>{book.category}</td>
                 <td>{book.pageCount}</td>
                 <td>${book.price.toFixed(2)}</td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-success"
+                    onClick={() => addToCart(book)}
+                  >
+                    Add to Cart
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={7} className="text-center text-danger">
-                No books available
+              <td colSpan={8} className="text-center text-danger">
+                {error || "No books available"}
               </td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* Pagination */}
       <div className="d-flex justify-content-between align-items-center">
         <button
           className="btn btn-primary"
@@ -119,7 +181,6 @@ const App = () => {
           Next ▶
         </button>
 
-        {/* Page Size Selection */}
         <div>
           <label>Results per page: </label>
           <select
@@ -131,6 +192,52 @@ const App = () => {
             <option value="10">10</option>
             <option value="20">20</option>
           </select>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <h4>🛒 Cart Summary</h4>
+        {cart.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <ul className="list-group">
+            {cart.map((item) => (
+              <li className="list-group-item d-flex justify-content-between align-items-center" key={item.id}>
+                <div>
+                  <strong>{item.title}</strong>
+                  <div className="text-muted small">
+                    {item.quantity} x ${item.price.toFixed(2)}
+                  </div>
+                </div>
+                <div className="fw-semibold">${(item.quantity * item.price).toFixed(2)}</div>
+              </li>
+            ))}
+            <li className="list-group-item d-flex justify-content-between fw-bold">
+              <div>Total</div>
+              <div>${total.toFixed(2)}</div>
+            </li>
+          </ul>
+        )}
+      </div>
+
+      <div className="toast-container position-fixed bottom-0 end-0 p-3">
+        <div
+          id="liveToast"
+          className="toast show text-bg-primary"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          <div className="toast-header">
+            <strong className="me-auto">Welcome</strong>
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div className="toast-body">Happy shopping at our bookstore!</div>
         </div>
       </div>
     </div>
