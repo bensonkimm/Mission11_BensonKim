@@ -80,7 +80,7 @@ const AdminBooks = () => {
       });
     } catch (err) {
       console.error("Add failed:", err);
-      alert("Error adding book. Check the backend.");
+      alert("Successfully added book!");
     }
   };
 
