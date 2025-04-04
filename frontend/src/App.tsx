@@ -18,6 +18,9 @@ interface CartItem extends Book {
   quantity: number;
 }
 
+// ✅ Backend URL
+const BASE_URL = "https://waterproject-kim-backend-bpg0bcb2dgayfpam.eastus-01.azurewebsites.net";
+
 const App = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,16 +33,18 @@ const App = () => {
 
   useEffect(() => {
     axios
-      .get("https://localhost:7135/api/books", {
+      .get(`${BASE_URL}/api/books`, {
         params: {
           page: currentPage,
           pageSize,
           sort: sortBy,
-          ...(category && { category }), // only adds category if not empty
+          ...(category && { category }),
         },
       })
+
       .then((res) => {
-        setBooks(res.data);
+        setBooks(res.data as Book[]);
+    
         setError("");
       })
       .catch((err) => {
@@ -61,7 +66,6 @@ const App = () => {
       "Action",
     ]);
   }, []);
-  
 
   const addToCart = (book: Book) => {
     setCart((prevCart) => {
@@ -90,7 +94,8 @@ const App = () => {
   return (
     <div className="container mt-4">
       <h1 className="text-center">
-        📚 Benson's Online Bookstore <span className="badge bg-info">{books.length} Books</span>
+        📚 Benson's Online Bookstore{" "}
+        <span className="badge bg-info">{books.length} Books</span>
       </h1>
 
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -111,7 +116,7 @@ const App = () => {
             value={category}
             onChange={(e) => {
               setCategory(e.target.value);
-              setCurrentPage(1); // go to page 1 when category changes
+              setCurrentPage(1);
             }}
           >
             <option value="">All</option>
@@ -177,7 +182,10 @@ const App = () => {
           ◀ Prev
         </button>
         <span>Page {currentPage}</span>
-        <button className="btn btn-primary" onClick={() => setCurrentPage((p) => p + 1)}>
+        <button
+          className="btn btn-primary"
+          onClick={() => setCurrentPage((p) => p + 1)}
+        >
           Next ▶
         </button>
 
@@ -202,14 +210,19 @@ const App = () => {
         ) : (
           <ul className="list-group">
             {cart.map((item) => (
-              <li className="list-group-item d-flex justify-content-between align-items-center" key={item.id}>
+              <li
+                className="list-group-item d-flex justify-content-between align-items-center"
+                key={item.id}
+              >
                 <div>
                   <strong>{item.title}</strong>
                   <div className="text-muted small">
                     {item.quantity} x ${item.price.toFixed(2)}
                   </div>
                 </div>
-                <div className="fw-semibold">${(item.quantity * item.price).toFixed(2)}</div>
+                <div className="fw-semibold">
+                  ${(item.quantity * item.price).toFixed(2)}
+                </div>
               </li>
             ))}
             <li className="list-group-item d-flex justify-content-between fw-bold">

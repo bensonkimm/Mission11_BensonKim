@@ -11,6 +11,8 @@ interface Book {
   price: number;
 }
 
+const BASE_URL = "https://waterproject-kim-backend-bpg0bcb2dgayfpam.eastus-01.azurewebsites.net/api/books";
+
 const AdminBooks = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [newBook, setNewBook] = useState<Omit<Book, "id">>({
@@ -28,7 +30,7 @@ const AdminBooks = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await axios.get("https://localhost:7135/api/books", {
+      const response = await axios.get<Book[]>(BASE_URL, {
         params: { page, pageSize },
       });
       setBooks(response.data);
@@ -50,8 +52,7 @@ const AdminBooks = () => {
       pageCount: Number(newBook.pageCount),
       price: Number(newBook.price),
     };
-  
-    // Basic validation (optional)
+
     if (
       !payload.title ||
       !payload.author ||
@@ -63,9 +64,9 @@ const AdminBooks = () => {
       alert("Please fill in all fields correctly.");
       return;
     }
-  
+
     try {
-      await axios.post("https://localhost:7135/api/books", payload, {
+      await axios.post(BASE_URL, payload, {
         headers: { "Content-Type": "application/json" },
       });
       fetchBooks();
@@ -79,15 +80,14 @@ const AdminBooks = () => {
       });
     } catch (err) {
       console.error("Add failed:", err);
-      alert("Congratulations! Book added successfully.");
+      alert("Error adding book. Check the backend.");
     }
   };
-  
-  
+
   const handleUpdate = async () => {
     if (!editingBook) return;
     try {
-      await axios.put(`https://localhost:7135/api/books/${editingBook.id}`, editingBook);
+      await axios.put(`${BASE_URL}/${editingBook.id}`, editingBook);
       setEditingBook(null);
       fetchBooks();
     } catch (err) {
@@ -100,7 +100,7 @@ const AdminBooks = () => {
     if (!confirm) return;
 
     try {
-      await axios.delete(`https://localhost:7135/api/books/${bookId}`);
+      await axios.delete(`${BASE_URL}/${bookId}`);
       fetchBooks();
     } catch (err) {
       console.error("Delete failed:", err);
@@ -113,12 +113,12 @@ const AdminBooks = () => {
 
       <div className="card p-3 mb-4">
         <h5>{editingBook ? "Edit Book" : "Add a New Book"}</h5>
-        {["title", "author", "publisher", "category"].map((field) => (
+        {(["title", "author", "publisher", "category"] as (keyof Omit<Book, "id">)[]).map((field) => (
           <input
             key={field}
             className="form-control mb-2"
             placeholder={field[0].toUpperCase() + field.slice(1)}
-            value={(editingBook ?? newBook)[field as keyof Book]}
+            value={(editingBook ?? newBook)[field]}
             onChange={(e) => {
               const val = e.target.value;
               editingBook
