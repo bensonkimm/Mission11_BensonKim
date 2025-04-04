@@ -21,6 +21,11 @@
         "Name": "sort",
         "Type": "System.String",
         "IsRequired": false
+      },
+      {
+        "Name": "category",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": [
@@ -34,5 +39,63 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "WaterProject.API.Controllers.BooksController",
+    "Method": "AddBook",
+    "RelativePath": "api/Books",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "newBook",
+        "Type": "WaterProject.API.Models.Book",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "WaterProject.API.Models.Book",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "WaterProject.API.Controllers.BooksController",
+    "Method": "UpdateBook",
+    "RelativePath": "api/Books",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "updatedBook",
+        "Type": "WaterProject.API.Models.Book",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WaterProject.API.Controllers.BooksController",
+    "Method": "DeleteBook",
+    "RelativePath": "api/Books",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookToDelete",
+        "Type": "WaterProject.API.Models.Book",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

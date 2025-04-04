@@ -4,8 +4,9 @@ namespace WaterProject.API.Models
 {
     public class Book
     {
-        [Key] // Ensure this annotation is there
-        public int BookId { get; set; } // Change from Id to BookId
+        [Key]
+        public int BookID { get; set; }
+
 
         public string Title { get; set; }
         public string Author { get; set; }

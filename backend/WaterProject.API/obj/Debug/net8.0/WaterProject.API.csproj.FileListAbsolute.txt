@@ -134,4 +134,5 @@ C:\Users\benso\OneDrive\Desktop\Water Project\backend\WaterProject.API\bin\Debug
 C:\Users\benso\OneDrive\Desktop\Water Project\backend\WaterProject.API\bin\Debug\net8.0\runtimes\win-arm64\native\e_sqlite3.dll
 C:\Users\benso\OneDrive\Desktop\Water Project\backend\WaterProject.API\bin\Debug\net8.0\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\benso\OneDrive\Desktop\Water Project\backend\WaterProject.API\bin\Debug\net8.0\runtimes\win-x86\native\e_sqlite3.dll
-C:\Users\benso\OneDrive\Desktop\Water Project\backend\WaterProject.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\benso\OneDrive\Desktop\Water Project\backend\WaterProject.API\obj\Debug\net8.0\WaterProject.API.sourcelink.json
+C:\Users\benso\OneDrive\Desktop\Water Project\backend\WaterProject.API\bin\Debug\net8.0\Bookstore.sqlite
