@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/5c753e09-f06b-4b43-a87a-b055073b817d/resourceGroups/appsvc_windows_eastus/providers/Microsoft.Web/sites/WaterProject-Kim-Backend",
+    "appService.deploySubpath": "backend/WaterProject.API/publish",
+}
